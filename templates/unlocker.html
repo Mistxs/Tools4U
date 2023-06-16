@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+<section class="ftco-section">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                    <h6>Разблокировка визитов</h6>
+                    <p>Используется для экстренного разблокирования визитов, которые имеют одну ккм операцию</p>
+                    <p>Также можно использовать для быстрого получения ссылки на запись из операции ккм (кнопка "получить запись")</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+                    <div class="wrapper">
+                        <div class="row no-gutters">
+                            <div class="col-lg-8 col-md-7 order-md-last d-flex align-items-stretch">
+                                <div class="contact-wrap w-100 p-md-5 p-4">
+                                    <form method="POST" id="contactForm" name="contactForm" class="contactForm" action="{{ url_for('unlocker.unlock') }}">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="label" for="name">Ссылка на запись или ккм операцию</label>
+                                                    <input type="text" class="form-control" name="record_link" id="record_link" placeholder="https://yclients.com/timetable/232685#main_date=2023-05-22&open_modal_by_record_id=626695500">
+                                                </div>
+                                            </div>
+                                                <div class="col-md-12">
+                                                  <div class="form-group">
+                                                    <input type="button" value="Отправить на разблокировку" class="btn action-btn" onclick="unlock()">
+                                                    <input type="button" value="Получить запись" class="btn btn-primary" onclick="getinfo()">
+                                                    <div id="loader" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>
+                                                  </div>
+                                                </div>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-5 d-flex align-items-stretch">
+                                <div class="info-wrap bg-primary w-100 p-md-5 p-4" style="background: #873979 !important;">
+                                    <h4 style="color: #fff;">Результат выполнения</h4>
+                                    <div id="result"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    function performAction(actionFunction) {
+    var loader = document.getElementById('loader');
+    var buttons = document.getElementsByClassName('btn');
+
+    // Показываем индикатор загрузки
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+    }
+    loader.style.display = 'block';
+
+    // Выполняем действие
+    actionFunction()
+        .then(() => {
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        });
+}
+
+// Функции действий
+function unlock() {
+    var record_link = document.getElementById('record_link').value;
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("unlocker.unlock") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'record_link': record_link
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        resultContainer.innerHTML = data;
+    });
+}
+
+// Функции действий
+function getinfo() {
+    var record_link = document.getElementById('record_link').value;
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("unlocker.getinfo") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'record_link': record_link
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        resultContainer.innerHTML = data;
+    });
+}
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+    <section class="ftco-section pt-4 mb-5 ftco-intro">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                    <p>На этой странице мы предоставляем возможность пользователям искать потенциальные переплаты в своих визитах. Мы стремимся обеспечить более прозрачный и выгодный опыт для наших клиентов, позволяя им эффективно контролировать свои расходы.</p>
+                </div>
+                <div class="col-md-12 mb-4">
+                    <div class="col-md-12 mb-4">
+                    <form method="POST">
+<div class="form-group row">
+                        <div class="col-md-4 mb-4">
+                            <label for="start_date">Начальный период:</label>
+                            <input type="date" id="start_date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label for="end_date">Конечный период:</label>
+                            <input type="date" id="end_date" name="end_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label for="branch_number">Номер филиала:</label>
+                            <input type="number" id="branch_number" name="branch_number" class="form-control" required>
+                        </div>
+</div>
+                        <input type="button" value="Поиск" class="btn action-btn" onclick="findoverpayed()">
+                    </form>
+                </div>
+                     <div id="loader" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>
+                    <div id="result"></div>
+                </div>
+                <div class="col-md-12 mb-4">
+                    <p class="attention">Пока в процессе</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+
+function performAction(actionFunction) {
+    var loader = document.getElementById('loader');
+    var buttons = document.getElementsByClassName('btn');
+
+    // Показываем индикатор загрузки
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+    }
+    loader.style.display = 'block';
+
+    // Выполняем действие
+    actionFunction()
+        .then(() => {
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        });
+}
+
+
+
+// Функции действий
+function findoverpayed() {
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+     // Получение данных из формы
+    var formData = {
+                start_date: document.getElementById("start_date").value,
+                end_date: document.getElementById("end_date").value,
+                salon_id: document.getElementById("branch_number").value
+            };
+
+    return fetch('{{ url_for("overpayed.overpayed") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'dataset': formData
+        })
+    })
+    .then(function(response) {
+                // Обработка ответа от сервера
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Ошибка при выполнении запроса");
+                }
+            })
+    .then(data => {
+            // Очищаем контейнер от предыдущих данных
+            resultContainer.innerHTML = '';
+
+            var table1Data = data["success"];
+            var table2Data = data["dataset"];
+
+            // Создаем разметку таблицы
+            var tableHTML = '<table>';
+            tableHTML += '<thead><tr><th>Amount</th><th>Date</th><th>ID</th><th>Record ID</th></tr></thead>';
+            tableHTML += '<tbody>';
+
+            // Заполняем таблицу значениями из dataset
+            for (var i = 0; i < table2Data.length; i++) {
+                var row = table2Data[i];
+                tableHTML += '<tr>';
+                tableHTML += '<td>' + row.amount + '</td>';
+                tableHTML += '<td>' + row.date + '</td>';
+                tableHTML += '<td>' + row.id + '</td>';
+                tableHTML += '<td>' + row.record_id + '</td>';
+                tableHTML += '</tr>';
+            }
+
+            tableHTML += '</tbody></table>';
+
+            // Вставляем HTML-код таблицы в контейнер
+            resultContainer.innerHTML = tableHTML;
+    })
+}
+</script>
+
+{% endblock %}

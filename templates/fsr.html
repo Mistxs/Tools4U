@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+<section class="ftco-section">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                    <h6>Принудительное обновление статуса документа</h6>
+                    <p>Не забывай создавать тикет на 2Л, чтобы увеличить вес бага</p>
+                    <p>Ссылка на проблему в трекере: <a href = "https://tracker.yandex.ru/SUP-9147">https://tracker.yandex.ru/SUP-9147</a></p>
+                </div>
+
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+                    <div class="wrapper">
+                        <div class="row no-gutters">
+                            <div class="col-lg-8 col-md-7 order-md-last d-flex align-items-stretch">
+                                <div class="contact-wrap w-100 p-md-5 p-4">
+                                    <form method="POST" id="contactForm" name="contactForm" class="contactForm" action="{{ url_for('fsr.check_document') }}">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="label" for="name">Ссылка на ККМ операцию</label>
+                                                    <input type="text" class="form-control" name="kkm_link" id="kkm_link" placeholder="https://yclients.com/kkm/transactions/details/67248544/">
+                                                </div>
+                                            </div>
+                                                <div class="col-md-12">
+                                                  <div class="form-group">
+                                                     <span class="tips" data-tooltip="Запускает проверку статуса документа, связанного с визитом. Документ может принимать значения 1 (не напечатан чек продажи), 2 (печатается чек продажи), 3 (напечатан чек продажи), 4 (печатается чек возврата), 5 (напечатан чек возврата). Необходим, чтобы понять целесообразность применения утилиты, так как обновление статуса возможно только из значений 2 и 4">
+                                                    <input id="checkbtn" type="button" value="Проверить документ" class="btn btn-primary" onclick="getstatus()" style="background: #f99a62!important; border-color: #f99a62!important;">
+                                                   </span>
+                                                    <span class="tips" data-tooltip="После получения 2 или 4 статуса нужно нажать эту кнопку, чтобы увидеть, какой запрос уйдет на сервер. Обратить внимание нужно на общую структуру запроса, чтобы id операции соответствовал id из ссылки. После возврата ответа кнопка 'Исправить документ' будет доступна"><input id="prerunbtn" type="button" value="Сформировать запрос" class="btn btn-primary" onclick="getPayload()" style="background: #187585 !important; border-color: #187585 !important">
+                                                    </span>
+<!--                                                <span class="tips" data-tooltip="Отладочная кнопка, нужна была в тестах на обновление документов, когда ккм операция не содержала данных о чеке. Технически, нужна только чтобы сравнить результат работы кнопки 'Сформировать запрос' (здесь тоже самое что и на странице ккм операции). Жалко убирать, так как потратил полчаса чтобы получать эти данные)">-->
+<!--                                                    <input id="getresp" type="button" value="Загрузить ответ от ккм" class="btn btn-primary" onclick="getkkmresp()" style="background: #187585 !important; border-color: #187585 !important">-->
+<!--                                                    </span>-->
+                                                <span class="tips" data-tooltip="Самое главное действие. Будет отправлен POST запрос на сервер на роут save_result, в теле которого будет payload, сформированный кнопкой 'Сформировать запрос'">
+                                                    <input id="runbtn" type="button" value="Исправить документ" class="btn btn-primary" onclick="runForce()" disabled>
+                                                    </span>
+                                                    <div id="loader" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>
+                                                  </div>
+                                                </div>
+                                            <div class="col-md-12" id="pre-result">
+                                                Здесь будет код, который отправим для "лечения"
+                                            </div>
+                                            <div class="col-md-12" id="docstat">
+                                                <!-- Результат выполнения функции getdocumentstatus() будет выводиться здесь -->
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-5 d-flex align-items-stretch">
+                                <div class="info-wrap bg-primary w-100 p-md-5 p-4">
+                                    <h4 style="color: #fff;">Результат выполнения</h4>
+                                    <p class="mb-4">Здесь будет выводиться результат отправленного запроса</p>
+                                    <div id="result" style="min-height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    function performAction(actionFunction) {
+    var loader = document.getElementById('loader');
+    var buttons = document.getElementsByClassName('btn');
+
+    // Показываем индикатор загрузки
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+    }
+    loader.style.display = 'block';
+
+    // Выполняем действие
+    actionFunction()
+        .then(() => {
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        });
+}
+
+// Функции действий
+function getstatus() {
+    var kkm_link = document.getElementById('kkm_link').value;
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("fsr.check_document") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'kkm_link': kkm_link
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        resultContainer.innerHTML = data;
+    });
+}
+
+function getkkmresp() {
+    var kkm_link = document.getElementById('kkm_link').value;
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("fsr.kkmresponse") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'kkm_link': kkm_link
+        })
+    })
+
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Error: ' + response.status);
+    }
+    return response.json();
+})
+.then(data => {
+    if (data.error) {
+        resultContainer.innerHTML = data.error;
+        runButton.disabled = true;
+    } else {
+        var formattedData = JSON.stringify(data, null, 2);
+        resultContainer.innerHTML = '<pre>' + formattedData + '</pre>';
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+    resultContainer.innerHTML = 'Произошла ошибка при получении данных';
+});
+
+}
+
+function getPayload() {
+    var kkm_link = document.getElementById('kkm_link').value;
+    var resultContainer = document.getElementById('pre-result');
+    var warningContainer = document.getElementById('docstat');
+    var runButton = document.getElementById('runbtn');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+   return fetch('{{ url_for("fsr.get_payload") }}', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        'kkm_link': kkm_link
+    })
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Error: ' + response.status);
+    }
+    return response.json();
+})
+
+
+.then(data => {
+    if (data.error) {
+        resultContainer.innerHTML = data.error;
+        runButton.disabled = true;
+    } else {
+
+        var formattedData = JSON.stringify(data, null, 2);
+<!--        var text = data[1];  // Получение второго элемента-->
+        resultContainer.innerHTML = '<pre>' + formattedData + '</pre>';
+<!--        warningContainer.innerHTML = text;-->
+        runButton.disabled = false;
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+    resultContainer.innerHTML = 'Произошла ошибка при получении данных';
+    runButton.disabled = true;
+});
+
+}
+
+
+
+function runForce() {
+    var payload = document.getElementById('pre-result').innerText;
+    var kkm_link = document.getElementById('kkm_link').value;
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("fsr.run_force") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'kkm_link': kkm_link
+        })
+    })
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Error: ' + response.status);
+    }
+    return response.json();
+})
+.then(data => {
+    if (data.error) {
+        resultContainer.innerHTML = data.error;
+    } else {
+        var formattedData = JSON.stringify(data, null, 2);
+        resultContainer.innerHTML = '<pre style = "font-size: 10px;line-height: 10px;background: #202124;color: wheat;">' + formattedData + '</pre>';
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+    resultContainer.innerHTML = 'Произошла ошибка при получении данных';
+});
+
+}
+</script>
+
+{% endblock %}
+

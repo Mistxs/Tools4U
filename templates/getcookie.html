@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+    <section class="ftco-section pt-4 mb-5 ftco-intro">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                    <p>GetCookie</p>
+                    <p>*****///*****</p>
+                </div>
+                <div class="col-md-12">
+                   <form method="POST" id="contactForm" name="contactForm" class="contactForm">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="label" for="name">user_id</label>
+                                                    <input type="text" class="form-control" name="text" id="text" placeholder="14587451">
+                                                </div>
+                                            </div>
+                                                <div class="col-md-12">
+                                                  <div class="form-group">
+                                                    <input type="button" value="Поиск" class="btn action-btn" onclick="search()">
+                                                      <div id="count"></div>
+
+
+                                                    <div id="loader" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>
+                                                      <div>
+                                                          <div id="result">                                                     </div>
+                                                  </div>
+                                                </div>
+
+                                        </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+
+document.getElementById('text').addEventListener('keydown', function(event) {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    search()
+  }
+});
+
+
+    function performAction(actionFunction) {
+    var loader = document.getElementById('loader');
+    var buttons = document.getElementsByClassName('btn');
+
+    // Показываем индикатор загрузки
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+    }
+    loader.style.display = 'block';
+
+    // Выполняем действие
+    actionFunction()
+        .then(() => {
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+
+            // Скрываем индикатор загрузки и активируем кнопки
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+            loader.style.display = 'none';
+        });
+}
+// Функции действий
+function search() {
+    var searchvalue = document.getElementById('text').value;
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("ucookie.kibana") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'text': searchvalue
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        resultContainer.innerHTML = data;
+    });
+}
+
+</script>
+{% endblock %}

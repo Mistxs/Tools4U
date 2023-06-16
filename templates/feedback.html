@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+    <section class="ftco-section pt-4 mb-5 ftco-intro">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                    <p>Мне очень важна ваша обратная связь!</p>
+                    <p>Если не хотите отправлять сообщение публично, можете указать чекбокс "анонимно", его увижу только я)</p>
+                </div>
+                <div class="col-md-12">
+                   <form method="POST" id="contactForm" name="contactForm" class="contactForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="label" for="text">Ну как тебе вообще проект? Что добавить / изменить?</label>
+                                    <textarea style="    padding: 20px;" class="form-control" name="text" id="text" rows="5" placeholder="Инна меня веселит, но ей не хватает чуть мозгов"></textarea>
+                                </div>
+
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <input type="checkbox" id="hideCheckbox" name="hide" value="1">
+                                    <label for="hideCheckbox">Анонимно</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <input type="button" value="Послать" class="btn searchbtn action-btn" onclick="sendFeedback()">
+                                    <div id="statusMessage"></div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-12 mt-4">
+                    <h2>Отзывы</h2>
+                    <table id="feedbackTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Текст</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedbackBody">
+                            <!-- Сюда будут добавлены отзывы -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+
+
+
+    // Функция для получения отзывов и добавления их на страницу
+    function getFeedback() {
+        fetch('/get_feedback')
+            .then(response => response.json())
+            .then(data => {
+                const feedbackBody = document.getElementById('feedbackBody');
+                feedbackBody.innerHTML = '';
+
+                data.forEach(item => {
+                    if (item.hide === 0) {
+                        const row = feedbackBody.insertRow();
+                        const dateCell = row.insertCell();
+                        const textCell = row.insertCell();
+                        dateCell.innerHTML = item.datetime;
+                        textCell.innerHTML = item.text;
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Вызываем функцию получения отзывов при загрузке страницы
+    window.addEventListener('load', getFeedback);
+
+// Функция для отправки отзыва
+function sendFeedback() {
+    const text = document.getElementById('text').value;
+    const hide = document.getElementById('hideCheckbox').checked ? 1 : 0;
+
+    // Проверяем, что поле с текстом отзыва не пустое
+    if (text.trim() === '') {
+        // Показываем сообщение об ошибке
+        showStatusMessage('Пожалуйста, введите текст отзыва', false);
+        return; // Прерываем выполнение функции
+    }
+
+    fetch('{{ url_for("feedback.submit_feedback") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'text': text,
+            'hide': hide
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        showStatusMessage('Отзыв успешно отправлен', true);
+        getFeedback();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showStatusMessage('Ошибка отправки отзыва', false);
+    });
+}
+
+
+// Функция для показа сообщения о статусе отправки
+function showStatusMessage(message, isSuccess) {
+    const statusMessage = document.getElementById('statusMessage');
+    statusMessage.innerText = message;
+    statusMessage.style.color = isSuccess ? 'green' : 'red';
+}
+
+</script>
+{% endblock %}

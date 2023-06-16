@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+  	<title>{{ title }} - Tools4Lulz</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/my.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+	  <link rel="stylesheet" href="{{ url_for('static', filename='css/fsr.css') }}">
+
+
+	</head>
+	<body>
+	<div id="colorlib-page">
+		<a href="#" class="js-colorlib-nav-toggle colorlib-nav-toggle"><i></i></a>
+		<aside id="colorlib-aside" role="complementary" class="js-fullheight">
+			<nav id="colorlib-main-menu" role="navigation">
+				<ul>
+					<li{% if active_page == 'start' %} class="colorlib-active"{% endif %}><a href="/start">Стартовая</a></li>
+					<li{% if active_page == 'fsr' %} class="colorlib-active"{% endif %}><a href="/fsr">Force Save Result</a></li>
+					<li{% if active_page == 'superloyal' %} class="colorlib-active"{% endif %}><a href="/superloyal">Суперлояльность</a></li>
+					<li{% if active_page == 'finance' %} class="colorlib-active"{% endif %}><a href="/finance">Поиск переплат</a></li>
+					<li{% if active_page == 'superday' %} class="colorlib-active new"{% endif %} class = "new"><a href="/daydetails">Записи за день</a></li>
+					<li{% if active_page == 'unlocker' %} class="colorlib-active"{% endif %}><a href="/unlock">Разблокировка визита</a></li>
+					<li{% if active_page == 'inna' %} class="colorlib-active"{% endif %}><a href="/inna">InnaBot</a></li>
+					<li{% if active_page == 'search' %} class="colorlib-active"{% endif %}><a href="/search">Поиск по трекеру</a></li>
+					<li{% if active_page == 'feedback' %} class="colorlib-active feedback"{% endif %}  class = "feedback" ><a href="/feedback">Обратная связь</a></li>
+				</ul>
+			</nav>
+
+<div class="prewarn-container">
+  <div class="prewarn-content">
+
+    <p class="prewarn active">Данный сайт (я надеюсь) позволит в будущем решить многие проблемы поддержки, связанные с работой в системе</p>
+    <p class="prewarn">Параллельно развертке проектов, указанных в меню, я всегда открыт к новым предложениям. Можете писать в Slack General (@U02NUTG60PL - @Анатолий Филиппов)</p>
+	<p class="prewarn">Во время работы над разблокировкой визитов я неожиданно понял, что могу дать этой фиче вторую жизнь, позволяя получать ссылку на визит. Попробуйте, поймете как это круто!</p>
+    <p class="prewarn">Также в планах на реализацию курс по ККМ. Все ссылки и материалы будут опубликованы здесь.</p>
+    <p class="prewarn">Сайт может неожиданно упасть, так как сервер крутится на моем домашнем компьютере, и сервис для туннелирования (ngrok) может перезапуститься (или мой ПК перезапустится, или свет отключиться - что угодно). За актуальной ссылкой всегда можно обратиться в личные сообщения</p>
+	<p class="prewarn">Здесь может быть ваша реклама)))</p>
+	  <p class="prewarn">Открыл страницу с отзывами! Можете делиться идеями, критиковать и хвалить в одном месте.</p>
+	<p class="prewarn">Когда-нибудь этот сервис уйдет в оффлайн, и вы будете его запускать в качестве локального сервера. Так вы сможете продолжать им пользоваться даже тогда, когда меня не станет :')	</p>
+	<p class="prewarn">Поиск по трекеру почти закончен, добавил динамические фильтры</p>
+	  <p class="prewarn">СуперЛояльность закончена (пока только для карт лояьлности)!!! Можно тестировать. Скоро добавлю в эту же функцию деталлизацию абонементов</p>
+	  <p class="prewarn">У меня тут есть скрытые разделы, которые не менее полезны, но выделять целую страницу под них - кощунство. Как думаете, сможете найти какие?</p>
+
+  </div>
+</div>
+
+
+
+		</aside> <!-- END COLORLIB-ASIDE -->
+
+		{% block content %}{% endblock %}
+
+	</div>
+
+	<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  	<script src="{{ url_for('static', filename='js/popper.js') }}"></script>
+  	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  	<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+	<script>
+  const prewarnElements = document.querySelectorAll('.prewarn');
+  let currentIndex = 0;
+
+  function showNextElement() {
+    prewarnElements[currentIndex].style.opacity = 0;
+    currentIndex = (currentIndex + 1) % prewarnElements.length;
+    prewarnElements[currentIndex].style.opacity = 1;
+    setTimeout(showNextElement, 8000); // Задержка между сменой элементов в миллисекундах
+  }
+
+  showNextElement();
+</script>
+	</body>
+</html>

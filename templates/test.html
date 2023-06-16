@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Прогресс</title>
+</head>
+<body>
+    <h1>Прогресс выполнения:</h1>
+    <div id="progress"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+            socket.on('progress_update', function(data) {
+                $("#progress").text(data.progress.toFixed(2) + '%');
+            });
+        });
+    </script>
+</body>
+</html>

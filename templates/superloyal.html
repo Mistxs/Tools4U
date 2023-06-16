@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+    <section class="ftco-section pt-4 mb-5 ftco-intro">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                    <p>Все просто - вставляете ссылку на страницу карты лояльности (экземпляра абонемента), нажимаете показать, видите копию данных с этой страницы + ссылки на визиты, где была создана операция</p>
+
+                </div>
+                <div class="col-md-12">
+                   <form method="POST" id="contactForm" name="contactForm" class="contactForm" action="{{ url_for('superloya.getdata') }}">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="label" for="name">Ссылка на страницу карты лояльности или на страницу абонемента</label>
+                                                    <input type="text" class="form-control" name="cardlink" id="cardlink" placeholder="https://yclients.com/group_loyalty_cards/show/525984/51820774">
+                                                </div>
+                                            </div>
+                                                <div class="col-md-12">
+                                                  <div class="form-group">
+                                                    <input type="button" value="Получить данные" class="btn action-btn" onclick="getdata()">
+                                                    <div id="loader" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>
+                                                      <div id="result">
+                                                      </div>
+                                                  </div>
+                                                </div>
+
+                                        </div>
+                  </form>
+                </div>
+                <div class="col-md-12 mb-4">
+                    <p class="attention">Понравилась утилита? Есть предложения? С нетерпением жду тебя на странице <a href="/feedback">обратной связи.</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+
+// Функции действий
+function getdata() {
+    var cardlink = document.getElementById('cardlink').value;
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("superloya.getdata") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'cardlink': cardlink
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Произошла ошибка. Статус: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Очищаем контейнер от предыдущих данных
+        resultContainer.innerHTML = '';
+
+        var table1Data = data["table1"];
+        var table2Data = data["table2"];
+        var table3Data = data["table3"];
+
+        // Формирование HTML-кода для таблицы 1
+        var table1HTML = '<table class="table table-striped programs table-responsive">';
+        table1Data.forEach(function(item) {
+            table1HTML += '<tr><td>' + item.name + '</td><td>' + item.data + '</td></tr>';
+        });
+        table1HTML += '</table>';
+
+        // Формирование HTML-кода для таблицы 2
+        table2HTML = "";
+        if (table2Data && table2Data.length > 0) {
+        var table2HTML = '<table class="table table-striped programs table-responsive">';
+        table2HTML += '<tr><th>#</th><th>Акция</th><th>Тип</th><th>Накоплено</th><th>Значение</th></tr>';
+        table2Data.forEach(function(item) {
+            table2HTML += '<tr><td>' + item.number + '</td><td>' + item.name + '</td><td>' + item.type + '</td><td>' + item.collect + '</td><td>' + item.amount + '</td></tr>';
+        });
+        table2HTML += '</table>';
+                  // Выводим таблицу 2
+          console.log(table2HTML);
+        }
+
+        // Формирование HTML-кода для таблицы 3
+        var table3HTML = '<table class="table table-striped programs table-responsive">';
+        table3HTML += '<tr><th>#</th><th>Дата создания транзакции</th><th>Тип</th><th>Акция</th><th>Сумма</th><th>Номер визита</th><th>Номер записи</th><th>Дата визита</th></tr>';
+        table3Data.forEach(function(item) {
+            table3HTML += '<tr><td>' + item.transaction_id + '</td><td>' + item.create_date + '</td><td>' + item.type + '</td><td>' + item.actions + '</td><td>' + item.amount + '</td><td>' + item.visit_id + '</td><td>' + item.record_id + '</td><td>' + item.date + '</td></tr>';
+        });
+        table3HTML += '</table>';
+
+        // Вставка HTML-кода таблиц в контейнер
+        resultContainer.innerHTML = table1HTML + table2HTML + table3HTML;
+    })
+    .catch(error => {
+        // Очищаем контейнер от предыдущих данных
+        resultContainer.innerHTML = '';
+
+        // Вставляем сообщение об ошибке
+        resultContainer.innerHTML = 'Произошла ошибка: ' + error.message;
+    });
+}
+
+
+</script>
+{% endblock %}

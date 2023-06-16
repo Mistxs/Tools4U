@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+    <section class="ftco-section pt-4 mb-5 ftco-intro">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                </div>
+                <div class="col-md-12">
+                   <form method="POST" id="contactForm" name="contactForm" class="contactForm">
+                                        <div class="row">
+                                                <div class="col-md-12">
+                                                  <div class="form-group">
+                                                    <input type="button" value="RUN" class="btn action-btn" onclick="search()">
+                                                      <div id="count"></div>
+
+
+                                                    <div id="loader" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>
+                                                        <div id="logContainer"></div>
+
+
+                                                      <div>
+                                                          <div id="result">                                                     </div>
+                                                     </div>
+                                                    </div>
+                                                </div>
+                                        </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+
+document.getElementById('text').addEventListener('keydown', function(event) {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    search()
+  }
+});
+
+
+// Функции действий
+function search() {
+    var resultContainer = document.getElementById('result');
+
+    // Показываем индикатор загрузки
+    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+
+    return fetch('{{ url_for("rsafe") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'text': 'GO'
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        resultContainer.innerHTML = data;
+    });
+}
+
+</script>
+
+    <script>
+$(document).ready(function() {
+    var lastTimestamp = '';
+    var requestFlag = true;
+
+    function getLogs() {
+        if (!requestFlag) {
+            return;
+        }
+
+        requestFlag = false;
+
+        $.getJSON('/logs', function(data) {
+            var newLogs = data.filter(function(log) {
+                return log.timestamp > lastTimestamp;
+            });
+
+            if (newLogs.length > 0) {
+                for (var i = 0; i < newLogs.length; i++) {
+                    var log = newLogs[i];
+                    var timestamp = log.timestamp;
+                    var message = log.message;
+
+                    var logItem = '<p><strong>' + timestamp + '</strong>: ' + message + '</p>';
+                    $('#logContainer').append(logItem);
+                }
+
+                lastTimestamp = newLogs[newLogs.length - 1].timestamp;
+
+                var logContainer = document.getElementById('logContainer');
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        }).always(function() {
+            requestFlag = true;
+        });
+    }
+
+    getLogs();
+    setInterval(getLogs, 5000);
+});
+
+    </script>
+
+{% endblock %}
