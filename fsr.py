@@ -2,18 +2,24 @@ from flask import Blueprint, render_template, request, jsonify
 from bs4 import BeautifulSoup
 import requests
 import json
+from slack_sdk import WebClient
+from config import headers, slack_token, auth_cookie
 
 fsr = Blueprint('fsr', __name__)
 
 baseurl = "https://yclients.com"
 
-# product
-auth_cookie = "__ddg1_=exsBazo8eGkna9M9Uomc; _cmg_csst1lPaz=1678712167; _comagic_id1lPaz=6941324878.10216608865.1678712167; _fbp=fb.1.1681128751602.1057597157; _ga=GA1.2.1928824817.1674055633; _ga_6EVFCY524B=GS1.1.1681134483.7.0.1681134486.0.0.0; _ga_P2LM7D8KSM=GS1.1.1683879274.17.0.1683879286.48.0.0; _gcl_au=1.1.919775470.1681900667; _ym_d=1674055633; _ym_uid=1674055633835203884; adrcid=AWjpZrOjq6FN88BP4tS2H8A; analytics-udid=G4EOvZYRcXAD9bObLSz4H6iBqHxdJXqcSVkhmRqN; app_service_level=0; app_service_level_ttl=1684482773; auth=u-11946640-e3689818c34c48aa83db4; tmr_lvid=35025bf4d92d6dc445d8f77c6cd09cfd; tmr_lvidTS=1674055632559; x-feature-waiting-room=0; yc_user_id=11946640; app_service_group=9; _ym_isad=2; tracking-index=1457; ycl_language_id=1; yc_company_id=543449; _cfuvid=m.LlGW_RF.J8iiSU_phnYHK7ACO55s2lVQY8Avwfa7s-1684430721275-0-604800000; __cfwaitingroom=ChhQb1hoNmcxOXZ5RFV4NU1UL2tYV3N3PT0SrAJpL1FLTldOTWE1TnZnSnBGcDU2YTFrNlFaVjdmMDBrMjRvQm4yVzVFZVE5bndnM3hHU3IybjNEOTZuMFE2Zml2Nll2TmU2cnNhdno4TGxsK1BVSzk2NGNqdEFCai94dkJqZkZkK2U0R1BMNEhCcFdmT2tGSkx2czFoRnVMM2dPd0l5blFiWE5xYWNpL2VUK0k0NXUzekI2NHdWdlJhbWNtQ2o2VHZYbWVYbzJuNmRxM0FreStVSE5PQm52S1dKT3FaQjljYmRaVnIyZ0d1S3p2WEFiR015eFk1WldaQms4YkNOQzhPNVVveTA5ZG1ybERacXg5eEQ3R3NHUVRmRlptaFhqTWxaNWxZWnJVeTlSSHUvTW45cU9IQ1Z1VlVNMTNOYUhJMFdVN0tLQT0%3D; __cf_bm=89PvUcd9QeXqeECWS9nZGP9IURUhVcEdDYYHdPH6G3Q-1684430722-0-ARkDth9CncmZbT+jMmYmKpLV6E1CX0d4YzFVFYqoEKtEMI02MJLldFqKlKGkThOQgBtWA+QBXyuaGfOCPsprQhW3k1XN8XoukWPNEF6QxXT89kmm7sk9JEKT22zo9u3Z6fHGInlOIKtuCymZD6+zcCc="
-headers = {
-    'Content-Type': 'application/json',
-    'Authorization': '93z5f8fmhcydaa2pj4ca, e69793634796c00b57cb4bfd34f361d8',
-    'Accept': 'application/vnd.yclients.v2+json'
-}
+channel = "#innachannel"  # Замените на имя канала, в который хотите отправить сообщение
+
+def send_slack_message(message):
+    client = WebClient(token=slack_token)
+    response = client.chat_postMessage(
+        channel=channel,
+        text=message
+    )
+    if response["ok"]:
+        return True
+    return False
 
 def getdata(url):
 
@@ -105,7 +111,7 @@ def run_force():
         return jsonify({'error': 'GETPAYLOAD. Некорректная ссылка, проверьте написание'})
     # Остальная логика выполнения force и получения результата
     kkm, resp, document, salon_id = getdata(kkm_link)
-    result = execute_force(kkm,resp)
+    result = execute_force(kkm,resp,salon_id)
     return result
 
 
@@ -163,7 +169,7 @@ def generate_payload(kkm_id,kkm_response):
 
 
 
-def execute_force(kkm_id,kkm_response):
+def execute_force(kkm_id,kkm_response,salon):
     if "CheckNumber" in kkm_response:
         check = kkm_response["CheckNumber"]
     else:
@@ -185,4 +191,7 @@ def execute_force(kkm_id,kkm_response):
         "kkm_response": kkm_response
     })
     response = requests.request("POST", url, headers=headers, data=payload).json()
+    message = f"Нажали исправить документ. KKMID: {kkm_id}, филиал {salon} "
+    send_slack_message(message)
     return response
+
