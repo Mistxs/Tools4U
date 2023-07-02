@@ -102,6 +102,7 @@ def rss():
 @app.route('/resafenow', methods=['POST'])
 def rsafe():
     text = request.json['text']
+    getshedule()
     resafe()
     return "{'status':'OK'}"
 
