@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Управление очередью салонов</title>
+    <style>
+        .tag {
+            display: inline-block;
+            background-color: #f1f1f1;
+            color: #555;
+            padding: 5px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .tag span {
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            loadSalons();
+
+            $('#add-form').submit(function(e) {
+                e.preventDefault();
+                var salonId = $('#salon_id').val();
+                if (salonId.trim() !== '') {
+                    addSalon(salonId);
+                    $('#salon_id').val('');
+                }
+            });
+        });
+
+        function addSalon(salonId) {
+            var tagContainer = $('#tags-container');
+            var tag = $('<div class="tag"></div>').text(salonId + ' ').append('<span onclick="removeSalon(this)">&#10006;</span>');
+            tagContainer.append(tag);
+            saveSalon(salonId);
+        }
+
+        function removeSalon(element) {
+            var salonId = $(element).parent().text().trim().split(' ')[0]; // Извлекаем только ID салона
+            $(element).parent().remove();
+            deleteSalon(salonId);
+        }
+
+        function saveSalon(salonId) {
+            $.ajax({
+                url: '/save_salon',
+                method: 'POST',
+                data: {salon_id: salonId},
+                success: function(response) {
+                    console.log('Salon saved successfully.');
+                }
+            });
+        }
+
+        function deleteSalon(salonId) {
+            $.ajax({
+                url: '/delete_salon',
+                method: 'POST',
+                data: {salon_id: salonId},
+                success: function(response) {
+                    console.log('Salon deleted successfully.');
+                }
+            });
+        }
+
+        function loadSalons() {
+            $.ajax({
+                url: '/get_salons',
+                method: 'GET',
+                success: function(response) {
+                    var salons = response.salons;
+                    var tagContainer = $('#tags-container');
+                    for (var i = 0; i < salons.length; i++) {
+                        var salonId = salons[i];
+                        var tag = $('<div class="tag"></div>').text(salonId + ' ').append('<span onclick="removeSalon(this)">&#10006;</span>');
+                        tagContainer.append(tag);
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Управление очередью салонов</h1>
+
+    <h2>Добавить салон в очередь</h2>
+    <form id="add-form">
+        <label for="salon_id">ID салона:</label>
+        <input type="number" id="salon_id" name="salon_id">
+        <button type="submit">Добавить</button>
+    </form>
+
+    <h2>Текущая очередь салонов</h2>
+    <div id="tags-container"></div>
+</body>
+</html>

@@ -4,13 +4,19 @@
   	<title>{{ title }} - Tools4Lulz</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='ico/apple-touch-icon.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='ico//favicon-32x32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='ico/favicon-16x16.png') }}">
+<link rel="manifest" href="{{ url_for('static', filename='ico/site.webmanifest') }}">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
-	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	  <link rel="stylesheet" href="{{ url_for('static', filename='css/my.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/my.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-	  <link rel="stylesheet" href="{{ url_for('static', filename='css/fsr.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/fsr.css') }}">
 
 
 	</head>
@@ -24,10 +30,12 @@
 					<li{% if active_page == 'fsr' %} class="colorlib-active"{% endif %}><a href="/fsr">Force Save Result</a></li>
 					<li{% if active_page == 'superloyal' %} class="colorlib-active"{% endif %}><a href="/superloyal">Суперлояльность</a></li>
 					<li{% if active_page == 'finance' %} class="colorlib-active"{% endif %}><a href="/finance">Поиск переплат</a></li>
-					<li{% if active_page == 'superday' %} class="colorlib-active new"{% endif %} class = "new"><a href="/daydetails">Записи за день</a></li>
+					<li{% if active_page == 'superday' %} class="colorlib-active"{% endif %} ><a href="/daydetails">Записи за день</a></li>
 					<li{% if active_page == 'unlocker' %} class="colorlib-active"{% endif %}><a href="/unlock">Разблокировка визита</a></li>
 					<li{% if active_page == 'inna' %} class="colorlib-active"{% endif %}><a href="/inna">InnaBot</a></li>
 					<li{% if active_page == 'search' %} class="colorlib-active"{% endif %}><a href="/search">Поиск по трекеру</a></li>
+					<li{% if active_page == 'dslots' %} class="colorlib-active new"{% endif %} class = "new"><a href="/repairslots">Пересохранение расписания</a></li>
+					<li{% if active_page == 'fiosplit' %} class="colorlib-active new"{% endif %} class = "new"><a href="/fiosplitter">Сплиттер ФИО</a></li>
 					<li{% if active_page == 'feedback' %} class="colorlib-active feedback"{% endif %}  class = "feedback" ><a href="/feedback">Обратная связь</a></li>
 				</ul>
 			</nav>

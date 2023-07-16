@@ -40,6 +40,7 @@ def getTransactions(salon, startdate, enddate):
     })
 
     response = requests.request("GET", url, headers=headers, data=payload).json()
+    print(response)
     for item in response["data"]:
         if checkDocuments(salon,item["document_id"]):
             print(item["record_id"])

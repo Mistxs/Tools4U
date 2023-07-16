@@ -7,7 +7,10 @@ from contact import feedback
 from getcookie import ucookie
 from overpayed import overpay
 from superday import superday
-from resafe import *
+from DSlotsRepair import dslots
+from fiosplitter import fiosplitter
+
+# from resafe import *
 import re
 
 app = Flask(__name__)
@@ -21,6 +24,8 @@ app.register_blueprint(feedback)
 app.register_blueprint(ucookie)
 app.register_blueprint(overpay)
 app.register_blueprint(superday)
+app.register_blueprint(dslots)
+app.register_blueprint(fiosplitter)
 
 
 
@@ -92,32 +97,19 @@ def overpayed():
     active_page = 'start'
     return render_template('superday.html', title=title, active_page=active_page)
 
-
-@app.route('/resafeshedule')
-def rss():
+@app.route('/repairslots')
+def repairslots():
     title = 'Пересохранение расписания'
-    active_page = 'rss'
-    return render_template('rss.html', title=title, active_page=active_page)
+    active_page = 'dslots'
+    return render_template('dslots.html', title=title, active_page=active_page)
 
-@app.route('/resafenow', methods=['POST'])
-def rsafe():
-    text = request.json['text']
-    resafe()
-    return "{'status':'OK'}"
+@app.route('/fiosplitter')
+def fio():
+    title = 'Сплиттер Имени на ФИО'
+    active_page = 'fiosplit'
+    return render_template('fiosplitter.html', title=title, active_page=active_page)
 
 
-@app.route('/logs')
-def get_logs():
-    with open('resafe.log', 'r', encoding='utf-8') as file:
-        logs = file.readlines()
-    data = []
-    for log in logs:
-        log_parts = re.split(r' - \w+ - ', log)
-        if len(log_parts) >= 2:
-            timestamp = log_parts[0]
-            message = ' - '.join(log_parts[1:]).strip()
-            data.append({'timestamp': timestamp, 'message': message})
-    return jsonify(data)
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=3000)

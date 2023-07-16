@@ -13,6 +13,10 @@
                                         <div class="row">
                                                 <div class="col-md-12">
                                                   <div class="form-group">
+                                                      <div class="col-md-3">
+                                                    <label class="label" for="salon">ID филиала</label>
+                                                    <input type="number" class="form-control" name="salon" id="salon" placeholder="4564">
+                                                </div>
                                                     <input type="button" value="RUN" class="btn action-btn" onclick="search()">
                                                       <div id="count"></div>
 
@@ -47,9 +51,10 @@ document.getElementById('text').addEventListener('keydown', function(event) {
 // Функции действий
 function search() {
     var resultContainer = document.getElementById('result');
+    var salonid = document.getElementById('salon').value;
 
     // Показываем индикатор загрузки
-    resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
+        resultContainer.innerHTML = '<div class="loader"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>';
 
     return fetch('{{ url_for("rsafe") }}', {
         method: 'POST',
@@ -57,7 +62,7 @@ function search() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'text': 'GO'
+            'text': salonid
         })
     })
     .then(response => response.text())
@@ -106,7 +111,7 @@ $(document).ready(function() {
     }
 
     getLogs();
-    setInterval(getLogs, 5000);
+    setTimeout(getLogs, 5000);
 });
 
     </script>

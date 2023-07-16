@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+    <section class="ftco-section pt-4 mb-5 ftco-intro">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+
+                </div>
+                <div class="col-md-12">
+                   <form  onsubmit="event.preventDefault();">
+                                        <div class="row">
+                                             <div class="form-group row">
+                                                <div class="col-md-3">
+                                                    <label class="label" for="salon">ID филиала</label>
+                                                    <input type="number" class="form-control" name="salon" id="salon" placeholder="4564">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="label" for="salon">Логин владельца</label>
+                                                    <input type="text" class="form-control" name="salon" id="login" placeholder="a.panov@ycients.tech">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="label" for="salon">Пароль владельца</label>
+                                                    <input type="password" class="form-control" name="salon" id="pass" placeholder="apanov">
+                                                </div>
+                                             </div>
+                                        </div>
+                                        <div class="row">
+
+                                                <div class="btn-group" role="group" aria-label="Menu">
+                                                    <button type="button" class="btn btn-primary checkbtn" onclick="getClients()">Получить данные</button>
+                                                    <button type="button" class="btn btn-primary runbtn" onclick="parseFIO()">Парсинг (разбить на ФИО)</button>
+                                                    <button type="button" class="btn btn-primary loadbtn" onclick="getError()">Отобразить ошибки парсинга</button>
+                                                    <button type="button" class="btn btn-primary warnbtn" onclick="saveResult()">Сохранить</button>
+                                                    <button type="button" class="btn btn-primary repairbtn" onclick="getReport()">Выгрузить ошибки</button>
+                                                </div>
+
+                                        </div>
+
+                  </form>
+                    </div>
+                    <div class="col-md-12">
+                        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+                     <div id="loader" style="display: none;">
+                         <i class="fa fa-spinner fa-spin"></i> Ждем...
+                     </div>
+                    <div id="result"></div>
+                    </div>
+
+                <div class="col-md-12 mb-4">
+                    <p class="attention">Понравилась утилита? Есть предложения? С нетерпением жду тебя на странице <a href="/feedback">обратной связи.</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/fiosplitter.js') }}"></script>
+{% endblock %}

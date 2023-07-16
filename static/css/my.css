@@ -1,4 +1,93 @@
-         #logContainer {
+    .alert {
+        padding: 10px;
+        margin-bottom: 10px;
+
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+
+
+
+.tag {
+            display: inline-block;
+            background-color: #f1f1f1;
+            color: #555;
+            padding: 5px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .tag span {
+            cursor: pointer;
+        }
+
+
+
+.checkbtn {
+    background: #f99a6200!important;
+    border-color: #f99a6254!important;
+    color: #f99a62!important;
+    box-shadow: -1px 7px 20px -7px rgba(0, 0, 0, 0.12)!important;
+         }
+.checkbtn:hover {
+background: #f99a62!important;
+    border-color: #f99a6254!important;
+    color: #fff!important;
+}
+
+.warnbtn {
+    background: #d5080800!important;
+    border-color: #d5080854!important;
+    color: #d50808!important;
+    box-shadow: -1px 7px 20px -7px rgba(0, 0, 0, 0.12)!important;
+         }
+.warnbtn:hover {
+background: #d50808!important;
+    border-color: #d5080854!important;
+    color: #fff!important;
+}
+
+.repairbtn {
+    background: #d5087a00!important;
+    border-color: #d5087a54!important;
+    color: #d5087a!important;
+    box-shadow: -1px 7px 20px -7px rgba(0, 0, 0, 0.12)!important;
+         }
+.repairbtn:hover {
+background: #d5087a!important;
+    border-color: #d5087a54!important;
+    color: #fff!important;
+}
+
+.loadbtn {
+    background: #18758500  !important;
+    border-color: #18758554!important;
+    color: #187585!important;
+    box-shadow: -1px 7px 20px -7px rgba(0, 0, 0, 0.12)!important;
+}
+.loadbtn:hover {
+background: #187585!important;
+    border-color: #187585!important;
+    color: #fff!important;
+}
+
+.runbtn {
+    background: #01d28e00!important;
+    border-color: #01d28e!important;
+    color: #01d28e!important;
+    box-shadow: -1px 7px 20px -7px rgba(0, 0, 0, 0.12)!important;
+}
+.runbtn:hover {
+    background: #01d28e!important;
+    border-color: #01d28e!important;
+    color: #fff!important;
+}
+
+#logContainer {
             background-color: black;
             color: white;
             padding: 10px;
@@ -6,7 +95,7 @@
                     height: 300px;
         overflow-y: auto;
     }
-        }
+
 
 
 .status-paid::before {
@@ -187,15 +276,12 @@ color: #ff4c9f;
 
 
 
-#result {
-    min-height: 300px;
-    word-wrap: break-word;
-}
+
 
 #result a {
 color: #ffffff;
     font-family: math;
-    }
+}
 
 #result a:hover {
 color: #4effc5;

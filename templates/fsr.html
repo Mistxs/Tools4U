@@ -30,15 +30,16 @@
                                                 <div class="col-md-12">
                                                   <div class="form-group">
                                                      <span class="tips" data-tooltip="Запускает проверку статуса документа, связанного с визитом. Документ может принимать значения 1 (не напечатан чек продажи), 2 (печатается чек продажи), 3 (напечатан чек продажи), 4 (печатается чек возврата), 5 (напечатан чек возврата). Необходим, чтобы понять целесообразность применения утилиты, так как обновление статуса возможно только из значений 2 и 4">
-                                                    <input id="checkbtn" type="button" value="Проверить документ" class="btn btn-primary" onclick="getstatus()" style="background: #f99a62!important; border-color: #f99a62!important;">
+                                                    <input id="checkbtn" type="button" value="Проверить документ" class="btn btn-primary checkbtn" onclick="getstatus()">
                                                    </span>
-                                                    <span class="tips" data-tooltip="После получения 2 или 4 статуса нужно нажать эту кнопку, чтобы увидеть, какой запрос уйдет на сервер. Обратить внимание нужно на общую структуру запроса, чтобы id операции соответствовал id из ссылки. После возврата ответа кнопка 'Исправить документ' будет доступна"><input id="prerunbtn" type="button" value="Сформировать запрос" class="btn btn-primary" onclick="getPayload()" style="background: #187585 !important; border-color: #187585 !important">
+                                                    <span class="tips" data-tooltip="После получения 2 или 4 статуса нужно нажать эту кнопку, чтобы увидеть, какой запрос уйдет на сервер. Обратить внимание нужно на общую структуру запроса, чтобы id операции соответствовал id из ссылки. После возврата ответа кнопка 'Исправить документ' будет доступна">
+                                                        <input id="prerunbtn" type="button" value="Сформировать запрос" class="btn btn-primary loadbtn" onclick="getPayload()">
                                                     </span>
 <!--                                                <span class="tips" data-tooltip="Отладочная кнопка, нужна была в тестах на обновление документов, когда ккм операция не содержала данных о чеке. Технически, нужна только чтобы сравнить результат работы кнопки 'Сформировать запрос' (здесь тоже самое что и на странице ккм операции). Жалко убирать, так как потратил полчаса чтобы получать эти данные)">-->
 <!--                                                    <input id="getresp" type="button" value="Загрузить ответ от ккм" class="btn btn-primary" onclick="getkkmresp()" style="background: #187585 !important; border-color: #187585 !important">-->
 <!--                                                    </span>-->
                                                 <span class="tips" data-tooltip="Самое главное действие. Будет отправлен POST запрос на сервер на роут save_result, в теле которого будет payload, сформированный кнопкой 'Сформировать запрос'">
-                                                    <input id="runbtn" type="button" value="Исправить документ" class="btn btn-primary" onclick="runForce()" disabled>
+                                                    <input id="runbtn" type="button" value="Исправить документ" class="btn btn-primary runbtn" onclick="runForce()" disabled>
                                                     </span>
                                                     <div id="loader" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Ждем...</div>
                                                   </div>

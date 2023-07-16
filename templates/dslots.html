@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="colorlib-main">
+    <section class="ftco-section pt-4 mb-5 ftco-intro">
+        <div class="container-fluid px-3 px-md-0">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h1 class="h2">{{ title }}</h1>
+                </div>
+                <div class="col-md-12">
+                   <form id="add-form">
+                                       <div class="row">
+                                            <div class="col-md-3">
+                                                <label class="label" for="salon_id">ID филиала</label>
+                                                <input type="number" class="form-control" name="salon_id" id="salon_id" placeholder="4564">
+                                            </div>
+                                       </div>
+                                       <div class="row">
+                                           <div class="col-md-12">
+                                               <button type="submit" class="btn mt-2 checkbtn">Добавить в очередь</button>
+                                               <input type="button" value="Запустить без очереди" class="btn mt-2 runbtn" onclick="force()">
+                                               <input type="button" value="Сохранить расписание в БД" class="btn mt-2 loadbtn" onclick="savedb()">
+                                               <input type="button" value="Удалить все расписание" class="btn mt-2 warnbtn" onclick="clearSh()">
+                                               <input type="button" value="Восстановить расписание из БД" class="btn mt-2 repairbtn" onclick="repair()">
+                                           </div>
+                                       </div>
+                                        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+                                        <div id="result"></div>
+
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <h4>Текущая очередь салонов</h4>
+                                                <div id="tags-container"></div>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <div id="logContainer"></div>
+                                            </div>
+                                        </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/dslots.js') }}"></script>
+
+
+{% endblock %}
+
+
