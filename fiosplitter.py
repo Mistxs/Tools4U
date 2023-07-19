@@ -182,8 +182,9 @@ def saveResult(salon, data, headers, usertoken):
             "phone": item['phone'],
             "surname": item['surname']
         })
+        print(url)
         response = requests.request("PUT", url, headers=headers, data=payload)
-        print(response)
+        print(response.text)
 
 @fiosplitter.route('/getReport')
 def get_report():
@@ -221,3 +222,4 @@ def get_report():
     response.headers['Content-Disposition'] = 'attachment; filename=report.xlsx'
 
     return response
+
